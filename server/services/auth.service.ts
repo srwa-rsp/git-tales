@@ -1,22 +1,6 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+
 import User from "../models/User";
-import { IUser } from "../types/interfaces";
-
-const JWT_SECRET = process.env.JWT_SECRET || "";
-
-export const hashPassword = async (password: string) => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-};
-
-export const comparePasswords = async (password: string, hashedPassword: string) => {
-  return bcrypt.compare(password, hashedPassword);
-};
-
-export const generateToken = (user: IUser) => {
-  return jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
-};
+import { comparePasswords, generateToken, hashPassword } from "../utils/utils";
 
 
 export const registerUser = async (username: string, email: string, password: string) => {
