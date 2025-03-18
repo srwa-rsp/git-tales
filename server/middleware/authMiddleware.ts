@@ -1,25 +1,25 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../utils/consts";
+import { AuthRequest } from "../types/interfaces";
 
-const JWT_SECRET = process.env.JWT_SECRET || "";
 
-interface AuthRequest extends Request {
-  user?: any;
-}
 
-export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
-  let token = req.headers.authorization;
-  
-  if (!token || !token.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction) :Promise<void> => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader || typeof authHeader !== "string" || !authHeader.startsWith("Bearer ")) {
+     res.status(401).json({ message: "Unauthorized" });
+     return;
   }
-
+  const token = authHeader.split(" ")[1];
   try {
-    token = token.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    console.log("Invalid token");
+   res.status(401).json({ message: "Invalid token" });
+   return;
   }
 };
