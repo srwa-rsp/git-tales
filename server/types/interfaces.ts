@@ -1,3 +1,5 @@
+import { JwtPayload } from "jsonwebtoken";
+import { Request } from "express";
 import { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
@@ -17,4 +19,7 @@ export interface IStory extends Document {
     isPublic: boolean;
     likes: Types.ObjectId[];
     comments: { user: Types.ObjectId; text: string }[];
+  }
+  export interface AuthRequest extends Request {
+    user?: string | JwtPayload;
   }
